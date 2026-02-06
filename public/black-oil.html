@@ -1,0 +1,40 @@
+<!-- frontend/black-oil.html 核心部分 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Engine Oil Management | 引擎油管理</title>
+  <style>
+    /* 蓝白色主题 */
+    body { background: #f0f8ff; color: #003366; }
+    .btn { background: #4a90e2; color: white; border: none; padding: 8px 16px; }
+    .alert-red { background: red; color: white; }
+    .alert-yellow { background: yellow; color: #003366; }
+  </style>
+</head>
+<body>
+  <!-- 语言切换 -->
+  <button onclick="switchLang('zh')">中文</button>
+  <button onclick="switchLang('en')">English</button>
+  
+  <!-- 车牌录入 -->
+  <div>
+    <label id="plate-label">车牌：</label>
+    <input type="text" id="plate-input">
+    <button class="btn" onclick="checkPlate()">校验</button>
+  </div>
+
+  <script>
+    // 中英双语切换字典
+    const lang = {
+      zh: { plate: '车牌', check: '校验' },
+      en: { plate: 'License Plate', check: 'Validate' }
+    };
+    function switchLang(type) {
+      document.getElementById('plate-label').innerText = lang[type].plate + '：';
+    }
+    // 调用后端接口校验车牌
+    function checkPlate() { /* ... */ }
+  </script>
+</body>
+</html>
