@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/simsim8619/yong-shun-truck-management#readme",
   "dependencies": {
+    "nodemailer": "^8.0.0",
     "sqlite3": "^5.1.7"
   }
 }

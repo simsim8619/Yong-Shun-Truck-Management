@@ -1,76 +1,23 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prediction Management</title>
-  <link rel="stylesheet" href="./assets/css/style.css">
-</head>
-<body>
-  <div class="header">
-    <h1 data-lang="predict">预测管理</h1>
-    <div class="lang-switch">
-      <button onclick="switchLang('zh')">中文</button>
-      <button onclick="switchLang('en')">English</button>
-    </div>
-  </div>
-
-  <div class="form-container">
-    <div class="form-group">
-      <label data-lang="plate" for="plate"></label>
-      <input type="text" id="plate" placeholder="请输入车牌">
-    </div>
-
-    <div class="form-group">
-      <label data-lang="plannedMileage" for="plannedMileage"></label>
-      <input type="number" id="plannedMileage" placeholder="请输入计划里程" min="1">
-    </div>
-
-    <button class="btn-submit" onclick="predict()" data-lang="calcMileage"></button>
-    <button class="btn-submit" onclick="sendAlertEmail()" style="margin-top: 10px;" data-lang="sendEmail"></button>
-  </div>
-
-  <div id="result" class="result"></div>
-
-  <a href="index.html" class="btn-back" data-lang="back"></a>
-
-  <script src="./assets/js/common.js"></script>
-  <script>
-    // 预测计算
-    async function predict() {
-      const plate = document.getElementById("plate").value.trim();
-      const planned = document.getElementById("plannedMileage").value;
-      if (!plate) return alert(langDict[currentLang].plateEmpty);
-      if (planned <= 0) return alert(langDict[currentLang].mileagePositive);
-      
-      const res = await requestApi("/predict", "POST", { plate, planned_mileage: planned });
-      if (res.code === 0) {
-        let resultText = "";
-        if (res.data.blackOil) {
-          resultText += `引擎油：${res.data.blackOil.alert}（剩余里程：${res.data.blackOil.remain_final}）\n`;
-        }
-        if (res.data.gearOil) {
-          resultText += `齿轮油：${res.data.gearOil.alert}（剩余里程：${res.data.gearOil.remain_final}）\n`;
-        }
-        const resultEl = document.getElementById("result");
-        resultEl.textContent = resultText;
-        // 取优先级最高的颜色
-        const color = res.data.blackOil?.color === "red" || res.data.gearOil?.color === "red" 
-          ? "red" 
-          : res.data.blackOil?.color === "yellow" || res.data.gearOil?.color === "yellow" 
-            ? "yellow" 
-            : "white";
-        resultEl.className = `result ${color}`;
-      } else {
-        alert(res.msg);
-      }
-    }
-
-    // 发送预警邮件
-    async function sendAlertEmail() {
-      const res = await requestApi("/notice", "GET");
-      alert(res.msg);
-    }
-  </script>
-</body>
-</html>
+<h2>预测更换表</h2>
+<button id="addPredictedRowBtn" onclick="addPredictedRow()">添加新行</button>
+<button onclick="updatePredictedTable()">更新预测数据</button>
+<table id="predictedTable">
+    <thead>
+        <tr>
+            <th>A列: 车牌</th>
+            <th>B列: 计划里程</th>
+            <th>C列: 黑油当前里程</th>
+            <th>D列: 黑油下次保养里程</th>
+            <th>E列: 黑油最终剩余里程</th>
+            <th>F列: 黑油报警</th>
+            <th>G列: 齿轮油当前里程</th>
+            <th>H列: 齿轮油下次保养里程</th>
+            <th>I列: 齿轮油最终剩余里程</th>
+            <th>J列: 齿轮油报警</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- 数据行由JS生成 -->
+    </tbody>
+</table>
