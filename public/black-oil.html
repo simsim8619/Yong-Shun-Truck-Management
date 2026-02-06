@@ -1,40 +1,44 @@
-<!-- frontend/black-oil.html 核心部分 -->
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <title>Engine Oil Management | 引擎油管理</title>
-  <style>
-    /* 蓝白色主题 */
-    body { background: #f0f8ff; color: #003366; }
-    .btn { background: #4a90e2; color: white; border: none; padding: 8px 16px; }
-    .alert-red { background: red; color: white; }
-    .alert-yellow { background: yellow; color: #003366; }
-  </style>
-</head>
-<body>
-  <!-- 语言切换 -->
-  <button onclick="switchLang('zh')">中文</button>
-  <button onclick="switchLang('en')">English</button>
-  
-  <!-- 车牌录入 -->
-  <div>
-    <label id="plate-label">车牌：</label>
-    <input type="text" id="plate-input">
-    <button class="btn" onclick="checkPlate()">校验</button>
-  </div>
+// public/assets/js/blackOil.js - 前端请求后端接口
+// 你的 Vercel 域名，替换成实际的
+const BASE_URL = 'https://xxx.vercel.app/api/blackOil';
 
-  <script>
-    // 中英双语切换字典
-    const lang = {
-      zh: { plate: '车牌', check: '校验' },
-      en: { plate: 'License Plate', check: 'Validate' }
-    };
-    function switchLang(type) {
-      document.getElementById('plate-label').innerText = lang[type].plate + '：';
-    }
-    // 调用后端接口校验车牌
-    function checkPlate() { /* ... */ }
-  </script>
-</body>
-</html>
+// 1. 车牌校验
+async function checkPlate(plate, lang) {
+  const res = await fetch(BASE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'checkPlate', plate, lang })
+  });
+  const data = await res.json();
+  alert(data.msg);
+  return data.valid;
+}
+
+// 2. 里程计算+预警
+async function calcMileage(total, consumption, lang) {
+  const res = await fetch(BASE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'calcMileage', total_mileage: total, consumption_mileage: consumption, lang })
+  });
+  const data = await res.json();
+  if (data.code === 0) {
+    // 渲染预警信息和标色（对应原 VBA 单元格标色）
+    document.getElementById('alert-msg').innerText = data.data.alertMsg;
+    document.getElementById('mileage-card').style.backgroundColor = data.data.color;
+  } else {
+    alert(data.msg);
+  }
+}
+
+// 3. 保存数据
+async function saveData(formData, lang) {
+  const res = await fetch(BASE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'saveData', ...formData })
+  });
+  const data = await res.json();
+  alert(data.msg);
+  if (data.code === 0) location.reload(); // 保存成功刷新页面
+}
