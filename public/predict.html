@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prediction Management</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+  <div class="header">
+    <h1 data-lang="predict">预测管理</h1>
+    <div class="lang-switch">
+      <button onclick="switchLang('zh')">中文</button>
+      <button onclick="switchLang('en')">English</button>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <div class="form-group">
+      <label data-lang="plate" for="plate"></label>
+      <input type="text" id="plate" placeholder="请输入车牌">
+    </div>
+
+    <div class="form-group">
+      <label data-lang="plannedMileage" for="plannedMileage"></label>
+      <input type="number" id="plannedMileage" placeholder="请输入计划里程" min="1">
+    </div>
+
+    <button class="btn-submit" onclick="predict()" data-lang="calcMileage"></button>
+    <button class="btn-submit" onclick="sendAlertEmail()" style="margin-top: 10px;" data-lang="sendEmail"></button>
+  </div>
+
+  <div id="result" class="result"></div>
+
+  <a href="index.html" class="btn-back" data-lang="back"></a>
+
+  <script src="./assets/js/common.js"></script>
+  <script>
+    // 预测计算
+    async function predict() {
+      const plate = document.getElementById("plate").value.trim();
+      const planned = document.getElementById("plannedMileage").value;
+      if (!plate) return alert(langDict[currentLang].plateEmpty);
+      if (planned <= 0) return alert(langDict[currentLang].mileagePositive);
+      
+      const res = await requestApi("/predict", "POST", { plate, planned_mileage: planned });
+      if (res.code === 0) {
+        let resultText = "";
+        if (res.data.blackOil) {
+          resultText += `引擎油：${res.data.blackOil.alert}（剩余里程：${res.data.blackOil.remain_final}）\n`;
+        }
+        if (res.data.gearOil) {
+          resultText += `齿轮油：${res.data.gearOil.alert}（剩余里程：${res.data.gearOil.remain_final}）\n`;
+        }
+        const resultEl = document.getElementById("result");
+        resultEl.textContent = resultText;
+        // 取优先级最高的颜色
+        const color = res.data.blackOil?.color === "red" || res.data.gearOil?.color === "red" 
+          ? "red" 
+          : res.data.blackOil?.color === "yellow" || res.data.gearOil?.color === "yellow" 
+            ? "yellow" 
+            : "white";
+        resultEl.className = `result ${color}`;
+      } else {
+        alert(res.msg);
+      }
+    }
+
+    // 发送预警邮件
+    async function sendAlertEmail() {
+      const res = await requestApi("/notice", "GET");
+      alert(res.msg);
+    }
+  </script>
+</body>
+</html>

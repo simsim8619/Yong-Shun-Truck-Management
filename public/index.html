@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yong Shun Truck Management</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+  <div class="header">
+    <h1 data-lang="home">主页</h1>
+    <div class="lang-switch">
+      <button onclick="switchLang('zh')">中文</button>
+      <button onclick="switchLang('en')">English</button>
+    </div>
+  </div>
+
+  <div class="nav-cards">
+    <div class="card" onclick="window.location.href='black-oil.html'">
+      <h2 data-lang="blackOil">引擎油管理</h2>
+      <p data-lang="blackOilDesc">管理卡车引擎油的里程和维护数据</p>
+      <button data-lang="blackOil">进入</button>
+    </div>
+
+    <div class="card" onclick="window.location.href='gear-oil.html'">
+      <h2 data-lang="gearOil">齿轮油管理</h2>
+      <p data-lang="gearOilDesc">管理卡车齿轮油的里程和维护数据</p>
+      <button data-lang="gearOil">进入</button>
+    </div>
+
+    <div class="card" onclick="window.location.href='predict.html'">
+      <h2 data-lang="predict">预测管理</h2>
+      <p data-lang="predictDesc">输入计划里程，预测油液剩余寿命</p>
+      <button data-lang="predict">进入</button>
+    </div>
+  </div>
+
+  <script src="./assets/js/common.js"></script>
+</body>
+</html>
